@@ -6,7 +6,7 @@ Handles expense management and tracking
 import pandas as pd
 from datetime import datetime, timedelta
 from database import db, log_activity
-from utils import normalize_date_range
+from utils import normalize_date_range, format_currency
 
 EXPENSE_CATEGORIES = [
     'Rent',
@@ -46,7 +46,7 @@ def add_expense(category, description, amount, user_id=None):
         }).execute()
 
         if user_id:
-            log_activity(user_id, "Add Expense", f"Added ${amount:.2f} for {category}")
+            log_activity(user_id, "Add Expense", f"Added {format_currency(amount)} for {category}")
         return True, "Expense added successfully!"
     except Exception as e:
         return False, str(e)

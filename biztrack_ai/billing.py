@@ -7,7 +7,7 @@ import pandas as pd
 from datetime import datetime
 
 from database import db, log_activity
-from utils import normalize_date_range
+from utils import normalize_date_range, format_currency
 
 PAYMENT_METHODS = ["Cash", "Card", "UPI", "Bank Transfer", "Other"]
 
@@ -192,7 +192,7 @@ def create_bill(items, customer_name="", payment_method="Cash", notes="",
             log_activity(
                 user_id,
                 "Create Bill",
-                f"{bill_number} — ${total_amount:.2f} ({len(normalized_items)} items)",
+                f"{bill_number} — {format_currency(total_amount)} ({len(normalized_items)} items)",
             )
 
         return True, bill_id

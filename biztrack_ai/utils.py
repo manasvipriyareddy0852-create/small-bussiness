@@ -7,10 +7,11 @@ import pandas as pd
 from datetime import datetime, date, time
 
 def format_currency(amount):
-    """Format number as currency"""
+    """Format number as Indian Rupees (INR)."""
     if amount is None:
-        return "$0.00"
-    return f"${amount:,.2f}"
+        return "₹0.00"
+    sign = "-" if float(amount) < 0 else ""
+    return f"{sign}₹{abs(float(amount)):,.2f}"
 
 def format_number(num):
     """Format number with commas"""

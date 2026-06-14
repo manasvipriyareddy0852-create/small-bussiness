@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import inventory
 import sales
 import expenses
+from utils import format_currency
 
 def generate_insights():
     """Generate comprehensive business insights"""
@@ -26,7 +27,7 @@ def generate_insights():
             'type': 'success',
             'icon': '🏆',
             'title': 'Best Selling Product',
-            'insight': f'"{best_seller["Product"]}" is your top seller with {int(best_seller["Units Sold"])} units sold, generating ${best_seller["Revenue"]:,.2f} in revenue.'
+            'insight': f'"{best_seller["Product"]}" is your top seller with {int(best_seller["Units Sold"])} units sold, generating {format_currency(best_seller["Revenue"])} in revenue.'
         })
 
     # Low stock warning
@@ -52,7 +53,7 @@ def generate_insights():
                 'type': 'info',
                 'icon': symbol,
                 'title': 'Revenue Trend',
-                'insight': f'Revenue {trend} by {abs(growth):.1f}% compared to last month. Current: ${current:,.2f}'
+                'insight': f'Revenue {trend} by {abs(growth):.1f}% compared to last month. Current: {format_currency(current)}'
             })
 
     # Profit margin insight
@@ -92,7 +93,7 @@ def generate_insights():
                 'type': 'warning',
                 'icon': '💡',
                 'title': 'Expense Alert',
-                'insight': f'Expenses increased by ${diff:,.2f} this month. Review your spending in top categories.'
+                'insight': f'Expenses increased by {format_currency(diff)} this month. Review your spending in top categories.'
             })
 
     # Top category performance
@@ -147,15 +148,15 @@ def get_performance_score():
     sales_stats = sales.get_sales_stats()
     monthly_revenue = sales_stats['monthly_revenue']
 
-    if monthly_revenue > 10000:
+    if monthly_revenue > 500000:
         score += 25
-    elif monthly_revenue > 5000:
+    elif monthly_revenue > 200000:
         score += 20
-    elif monthly_revenue > 1000:
+    elif monthly_revenue > 50000:
         score += 15
     elif monthly_revenue > 0:
         score += 10
-    details.append(f'Sales Performance: Based on ${monthly_revenue:,.0f} monthly revenue')
+    details.append(f'Sales Performance: Based on {format_currency(monthly_revenue)} monthly revenue')
 
     # Profitability (0-30 points)
     expense_stats = expenses.get_expense_stats()

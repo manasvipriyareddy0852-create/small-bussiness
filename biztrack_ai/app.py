@@ -182,7 +182,7 @@ def show_dashboard():
         if not monthly_sales.empty:
             monthly_sales = monthly_sales.sort_values('month')
             fig = px.area(monthly_sales, x='month', y='revenue',
-                         labels={'revenue': 'Revenue ($)', 'month': 'Month'})
+                         labels={'revenue': 'Revenue (₹)', 'month': 'Month'})
             fig.update_traces(
                 line=dict(color=colors['primary'], width=2.5),
                 fillcolor='rgba(13, 148, 136, 0.12)',
@@ -265,7 +265,7 @@ def show_dashboard():
         st.markdown(utils.get_section_header("📋", "Recent Transactions"), unsafe_allow_html=True)
         recent = sales.get_recent_transactions(5)
         if not recent.empty:
-            recent['Amount'] = recent['Amount'].apply(lambda x: f"${x:,.2f}")
+            recent['Amount'] = recent['Amount'].apply(utils.format_currency)
             st.dataframe(recent, use_container_width=True, hide_index=True)
         else:
             st.info("No transactions yet")
@@ -290,10 +290,10 @@ def show_inventory_page():
             supplier = st.text_input("Supplier")
             col_a, col_b = st.columns(2)
             with col_a:
-                cost_price = st.number_input("Cost Price ($)", min_value=0.0, format="%.2f")
+                cost_price = st.number_input("Cost Price (₹)", min_value=0.0, format="%.2f")
                 quantity = st.number_input("Quantity", min_value=0)
             with col_b:
-                selling_price = st.number_input("Selling Price ($)", min_value=0.0, format="%.2f")
+                selling_price = st.number_input("Selling Price (₹)", min_value=0.0, format="%.2f")
                 reorder_level = st.number_input("Reorder Level", min_value=0, value=10)
 
             if st.form_submit_button("Add Product", type="primary"):
@@ -333,7 +333,7 @@ def show_inventory_page():
             display_df = products_df.copy()
             for col in ['Cost Price', 'Selling Price']:
                 if col in display_df.columns:
-                    display_df[col] = display_df[col].apply(lambda x: f"${x:,.2f}")
+                    display_df[col] = display_df[col].apply(utils.format_currency)
 
             st.dataframe(display_df, use_container_width=True, hide_index=True)
 
@@ -356,10 +356,10 @@ def show_inventory_page():
                     new_supplier = st.text_input("Supplier", value=p[3] or "")
                     col_a, col_b = st.columns(2)
                     with col_a:
-                        new_cost = st.number_input("Cost Price", value=float(p[4]), format="%.2f")
+                        new_cost = st.number_input("Cost Price (₹)", value=float(p[4]), format="%.2f")
                         new_qty = st.number_input("Quantity", value=int(p[6]))
                     with col_b:
-                        new_price = st.number_input("Selling Price", value=float(p[5]), format="%.2f")
+                        new_price = st.number_input("Selling Price (₹)", value=float(p[5]), format="%.2f")
                         new_reorder = st.number_input("Reorder Level", value=int(p[7]))
 
                     col_a, col_b = st.columns(2)
@@ -434,8 +434,8 @@ def _render_bill_summary(bill):
 
     if not items_df.empty:
         display = items_df[["Product", "Qty", "Unit Price", "Line Total"]].copy()
-        display["Unit Price"] = display["Unit Price"].apply(lambda x: f"${x:,.2f}")
-        display["Line Total"] = display["Line Total"].apply(lambda x: f"${x:,.2f}")
+        display["Unit Price"] = display["Unit Price"].apply(utils.format_currency)
+        display["Line Total"] = display["Line Total"].apply(utils.format_currency)
         st.dataframe(display, use_container_width=True, hide_index=True)
 
     c1, c2, c3, c4 = st.columns(4)
@@ -477,7 +477,7 @@ def show_sales_page():
         with col_c:
             tax_rate = st.number_input("Tax rate (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.5)
         with col_d:
-            discount = st.number_input("Discount ($)", min_value=0.0, value=0.0, format="%.2f")
+            discount = st.number_input("Discount (₹)", min_value=0.0, value=0.0, format="%.2f")
 
         notes = st.text_input("Notes (optional)", placeholder="Delivery instructions, reference, etc.")
 
@@ -498,7 +498,7 @@ def show_sales_page():
         default_price = float(product[5]) if product else 0.0
 
         with col3:
-            add_price = st.number_input("Unit price ($)", min_value=0.0, value=default_price, format="%.2f",
+            add_price = st.number_input("Unit price (₹)", min_value=0.0, value=default_price, format="%.2f",
                                         key="bill_add_price")
 
         if st.button("Add to Bill", type="secondary"):
@@ -515,8 +515,8 @@ def show_sales_page():
             cart_df = pd.DataFrame(st.session_state.bill_cart)
             cart_display = cart_df[["product_name", "quantity", "unit_price", "line_total"]].copy()
             cart_display.columns = ["Product", "Qty", "Unit Price", "Line Total"]
-            cart_display["Unit Price"] = cart_display["Unit Price"].apply(lambda x: f"${x:,.2f}")
-            cart_display["Line Total"] = cart_display["Line Total"].apply(lambda x: f"${x:,.2f}")
+            cart_display["Unit Price"] = cart_display["Unit Price"].apply(utils.format_currency)
+            cart_display["Line Total"] = cart_display["Line Total"].apply(utils.format_currency)
             st.dataframe(cart_display, use_container_width=True, hide_index=True)
 
             subtotal = _bill_cart_subtotal()
@@ -592,7 +592,7 @@ def show_sales_page():
             display_df = bills_df.copy()
             for col in ["Subtotal", "Discount", "Tax", "Total"]:
                 if col in display_df.columns:
-                    display_df[col] = display_df[col].apply(lambda x: f"${x:,.2f}")
+                    display_df[col] = display_df[col].apply(utils.format_currency)
             st.dataframe(display_df, use_container_width=True, hide_index=True)
 
             total_billed = bills_df["Total"].sum() if "Total" in bills_df.columns else 0
@@ -602,7 +602,7 @@ def show_sales_page():
             s2.metric("Total Billed", utils.format_currency(total_billed))
 
             bill_options = {
-                f"{row['Bill No.']} — {row['Customer']} — ${row['Total']:,.2f}": row["Bill ID"]
+                f"{row['Bill No.']} — {row['Customer']} — {utils.format_currency(row['Total'])}": row["Bill ID"]
                 for _, row in bills_df.iterrows()
             }
             selected_bill_label = st.selectbox("View bill details", list(bill_options.keys()))
@@ -641,7 +641,7 @@ def show_expenses_page():
         with st.form("add_expense_form"):
             category = st.selectbox("Category", expenses.get_expense_categories())
             description = st.text_area("Description")
-            amount = st.number_input("Amount ($)", min_value=0.0, format="%.2f")
+            amount = st.number_input("Amount (₹)", min_value=0.0, format="%.2f")
 
             if st.form_submit_button("Add Expense", type="primary"):
                 if amount > 0:
@@ -679,7 +679,7 @@ def show_expenses_page():
         if not expenses_df.empty:
             # Format display
             display_df = expenses_df.copy()
-            display_df['Amount'] = display_df['Amount'].apply(lambda x: f"${x:,.2f}")
+            display_df['Amount'] = display_df['Amount'].apply(utils.format_currency)
 
             st.dataframe(display_df, use_container_width=True, hide_index=True)
 
@@ -837,7 +837,8 @@ def show_forecasting_page():
                 urgent = urgent[['name', 'category', 'current_stock',
                                'predicted_demand_14d', 'recommended_order', 'order_cost']]
                 urgent.columns = ['Product', 'Category', 'Current Stock',
-                                 'Pred. Demand (14d)', 'Order Qty', 'Est. Cost ($)']
+                                 'Pred. Demand (14d)', 'Order Qty', 'Est. Cost (₹)']
+                urgent['Est. Cost (₹)'] = urgent['Est. Cost (₹)'].apply(utils.format_currency)
 
                 st.dataframe(urgent, use_container_width=True, hide_index=True)
 

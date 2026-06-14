@@ -6,7 +6,7 @@ Handles sales recording and revenue tracking
 import pandas as pd
 from datetime import datetime, timedelta
 from database import db, log_activity
-from utils import normalize_date_range
+from utils import normalize_date_range, format_currency
 
 
 def _sales_df(rows):
@@ -57,8 +57,8 @@ def record_sale(product_id, product_name, quantity_sold, unit_price, user_id=Non
         }).eq("product_id", product_id).execute()
 
         if user_id:
-            log_activity(user_id, "Record Sale", f"Sold {quantity_sold}x {product_name} (${total_amount:.2f})")
-        return True, f"Sale recorded! Total: ${total_amount:.2f}"
+            log_activity(user_id, "Record Sale", f"Sold {quantity_sold}x {product_name} ({format_currency(total_amount)})")
+        return True, f"Sale recorded! Total: {format_currency(total_amount)}"
     except Exception as e:
         return False, str(e)
 

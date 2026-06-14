@@ -9,6 +9,7 @@ from database import db
 import inventory
 import sales
 import expenses
+from utils import format_currency
 
 
 def get_inventory_report():
@@ -109,11 +110,11 @@ def get_comprehensive_report():
         summary_data = {
             'Metric': ['Total Revenue', 'Total Expenses', 'Net Profit',
                        'Total Products', 'Inventory Value', 'Low Stock Count'],
-            'Value': [f"${profit_data['total_revenue']:,.2f}",
-                      f"${profit_data['total_expenses']:,.2f}",
-                      f"${profit_data['net_profit']:,.2f}",
+            'Value': [format_currency(profit_data['total_revenue']),
+                      format_currency(profit_data['total_expenses']),
+                      format_currency(profit_data['net_profit']),
                       len(inventory_df),
-                      f"${inventory.get_inventory_stats()['inventory_value']:,.2f}",
+                      format_currency(inventory.get_inventory_stats()['inventory_value']),
                       len(inventory.get_low_stock_products())]
         }
         summary_df = pd.DataFrame(summary_data)

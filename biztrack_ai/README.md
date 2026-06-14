@@ -1,6 +1,8 @@
 # Vyapar
 
-Smart Inventory & Bookkeeping for Small Businesses
+Smart Inventory & Bookkeeping for Indian Kirana & Grocery Stores
+
+All amounts are in **Indian Rupees (₹)**.
 
 ## Installation
 
@@ -35,7 +37,7 @@ After seeding:
 | Staff | staff@biztrack.ai   | demo123  |
 | Staff | manager@biztrack.ai | demo123  |
 
-**Seed includes:** 40 products (6 low-stock), 166 sales, 45 expenses, 25 activity logs.
+**Seed includes:** 40 Indian grocery products (7+ low-stock), ~168 sales, 45 expenses, 25 activity logs — all in ₹.
 
 ## Features
 

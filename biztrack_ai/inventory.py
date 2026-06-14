@@ -5,6 +5,7 @@ Handles CRUD operations for products
 
 import pandas as pd
 from database import db, log_activity
+from utils import format_currency
 
 
 def _product_tuple(row):
@@ -36,7 +37,7 @@ def add_product(name, category, supplier, cost_price, selling_price, quantity, r
         }).execute()
         product_id = response.data[0]["product_id"]
         if user_id:
-            log_activity(user_id, "Add Product", f"Added {name} (${selling_price})")
+            log_activity(user_id, "Add Product", f"Added {name} ({format_currency(selling_price)})")
         return True, product_id
     except Exception as e:
         return False, str(e)
