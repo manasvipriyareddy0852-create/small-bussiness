@@ -409,6 +409,10 @@ LIGHT_THEME = _COMMON_CSS + """
         border: 1.5px solid #e5e7eb !important;
         border-radius: 12px !important;
         transition: all .25s ease !important;
+        color: #1e1b4b !important;
+    }
+    .stSelectbox [data-baseweb="select"] span {
+        color: #1e1b4b !important;
     }
     .stSelectbox [data-baseweb="select"] > div:hover,
     .stSelectbox [data-baseweb="select"] > div:focus-within {
@@ -667,6 +671,10 @@ DARK_THEME = _COMMON_CSS + """
         background: rgba(30,27,75,.4) !important;
         border: 1.5px solid rgba(99,102,241,.2) !important;
         border-radius: 12px !important;
+        color: #e0e7ff !important;
+    }
+    .stSelectbox [data-baseweb="select"] span {
+        color: #e0e7ff !important;
     }
     .stSelectbox [data-baseweb="select"] > div:hover,
     .stSelectbox [data-baseweb="select"] > div:focus-within {
@@ -826,7 +834,7 @@ def get_sidebar_navigation():
 
 def get_login_hero_html():
     """Get the hero section HTML for the login page"""
-    return """
+    html = """
 <div style="
     background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4c1d95 100%);
     border-radius: 24px;
@@ -858,7 +866,6 @@ def get_login_hero_html():
         background: rgba(167,139,250,.08);
         border-radius: 50%;
     "></div>
-
     <!-- Content -->
     <div style="position: relative; z-index: 1;">
         <div style="
@@ -870,7 +877,6 @@ def get_login_hero_html():
             box-shadow: 0 8px 24px rgba(99,102,241,.4);
             font-size: 32px;
         ">📊</div>
-
         <h1 style="
             font-size: 36px;
             font-weight: 900;
@@ -880,7 +886,6 @@ def get_login_hero_html():
             line-height: 1.1;
             font-family: 'Inter', sans-serif;
         ">BizTrack AI</h1>
-
         <p style="
             color: rgba(199,210,254,.85) !important;
             font-size: 16px;
@@ -888,7 +893,6 @@ def get_login_hero_html():
             margin: 0 0 32px 0;
             line-height: 1.5;
         ">Smart Inventory & Bookkeeping<br>for Small Businesses</p>
-
         <div style="display: flex; flex-direction: column; gap: 16px;">
             <div style="display: flex; align-items: center; gap: 14px;">
                 <div style="
@@ -954,6 +958,7 @@ def get_login_hero_html():
     </div>
 </div>
 """
+    return "\n".join(line.strip() for line in html.split("\n"))
 
 def get_welcome_banner(user_name):
     """Get a styled welcome banner for the dashboard"""

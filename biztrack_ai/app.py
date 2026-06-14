@@ -42,6 +42,12 @@ if 'sample_data_loaded' not in st.session_state:
 # Apply theme
 st.markdown(utils.apply_theme(st.session_state.dark_mode), unsafe_allow_html=True)
 
+# Global toast notification handler
+if 'toast_msg' in st.session_state:
+    st.toast(st.session_state.toast_msg, icon="✅")
+    del st.session_state.toast_msg
+
+
 # ---------------------------------------------------------------------------
 # Chart layout helper
 # ---------------------------------------------------------------------------
@@ -82,7 +88,7 @@ def show_login_page():
     col_hero, col_spacer, col_form = st.columns([1.1, 0.1, 0.9])
 
     with col_hero:
-        st.markdown(utils.get_login_hero_html(), unsafe_allow_html=True)
+        st.html(utils.get_login_hero_html())
 
     with col_form:
         # Glassmorphism card wrapper
@@ -315,7 +321,7 @@ def show_inventory_page():
                         quantity, reorder_level, st.session_state.user['id']
                     )
                     if success:
-                        st.success(f"Product added! ID: {result}")
+                        st.session_state.toast_msg = f"Product added! ID: {result}"
                         st.rerun()
                     else:
                         st.error(result)
@@ -383,7 +389,7 @@ def show_inventory_page():
                                 st.session_state.user['id']
                             )
                             if success:
-                                st.success(msg)
+                                st.session_state.toast_msg = msg
                                 del st.session_state.edit_product
                                 st.rerun()
                             else:
@@ -391,7 +397,7 @@ def show_inventory_page():
                     with col_b:
                         if st.form_submit_button("Delete Product"):
                             inventory.delete_product(p[0], st.session_state.user['id'])
-                            st.success("Product deleted!")
+                            st.session_state.toast_msg = "Product deleted!"
                             del st.session_state.edit_product
                             st.rerun()
         else:
@@ -436,7 +442,7 @@ def show_sales_page():
                                 st.session_state.user['id']
                             )
                             if success:
-                                st.success(msg)
+                                st.session_state.toast_msg = msg
                                 st.rerun()
                             else:
                                 st.error(msg)
@@ -504,7 +510,7 @@ def show_expenses_page():
                         st.session_state.user['id']
                     )
                     if success:
-                        st.success(msg)
+                        st.session_state.toast_msg = msg
                         st.rerun()
                     else:
                         st.error(msg)
@@ -554,7 +560,7 @@ def show_expenses_page():
             expense_id = st.number_input("Enter Expense ID to Delete", min_value=0, step=1)
             if st.button("Delete Expense"):
                 expenses.delete_expense(expense_id, st.session_state.user['id'])
-                st.success("Expense deleted!")
+                st.session_state.toast_msg = "Expense deleted!"
                 st.rerun()
         else:
             st.info("No expense records found")
