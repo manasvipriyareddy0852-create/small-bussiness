@@ -29,7 +29,7 @@ st.set_page_config(
     page_title="Vyapar",
     page_icon="🏪",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto"
 )
 
 # Initialize session state
@@ -45,6 +45,7 @@ if 'bill_cart' not in st.session_state:
 # Apply theme
 st.markdown(utils.apply_theme(st.session_state.dark_mode), unsafe_allow_html=True)
 st.markdown(utils.get_form_controls_patch(st.session_state.dark_mode), unsafe_allow_html=True)
+st.markdown(utils.get_responsive_css(), unsafe_allow_html=True)
 
 # Global toast notification handler
 if 'toast_msg' in st.session_state:
@@ -62,7 +63,7 @@ def _chart_layout(fig, height=320):
     grid_color = 'rgba(148,163,184,0.15)' if is_dark else 'rgba(100,116,139,0.12)'
     fig.update_layout(
         height=height,
-        margin=dict(l=16, r=16, t=32, b=16),
+        margin=dict(l=8, r=8, t=36, b=8),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font=dict(family='Plus Jakarta Sans, sans-serif', size=12, color=text_color),
@@ -414,19 +415,13 @@ def _render_bill_summary(bill):
     """Show a formatted bill receipt."""
     items_df = billing.get_bill_items(bill["bill_id"])
     st.markdown(f"""
-<div style="
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 16px;
-">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 16px;">
+<div class="vy-invoice-card">
+    <div class="vy-invoice-header">
         <div>
             <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em;">Invoice</div>
             <div style="font-size: 22px; font-weight: 800; color: #0f172a;">{bill['bill_number']}</div>
         </div>
-        <div style="text-align: right; font-size: 13px; color: #64748b;">
+        <div class="vy-invoice-date">
             {utils.format_date(bill['bill_date'])}
         </div>
     </div>

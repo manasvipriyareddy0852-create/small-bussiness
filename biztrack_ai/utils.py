@@ -181,12 +181,9 @@ _COMMON_CSS = """
     }
     @media screen and (max-width: 768px) {
         .main .block-container { padding-left: 12px !important; padding-right: 12px !important; padding-top: 16px !important; }
-        [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; }
-        [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] { flex: 1 1 100% !important; min-width: 100% !important; }
         .main [data-testid="metric-container"] { padding: 14px 12px; }
         .main [data-testid="metric-container"] [data-testid="stMetricValue"] { font-size: 18px !important; }
         .stButton > button { padding: 12px 20px !important; min-height: 44px; }
-        section[data-testid="stSidebar"] { min-width: 260px !important; max-width: 280px !important; }
     }
 
     /* ===== Sidebar — dark cohesive nav ===== */
@@ -722,6 +719,164 @@ def get_form_controls_patch(is_dark=False):
 """
 
 
+def get_responsive_css():
+    """Mobile / tablet layout — stacks columns, touch targets, scrollable tables."""
+    col = '[data-testid="stColumn"], [data-testid="column"]'
+    row = '[data-testid="stHorizontalBlock"]'
+    return f"""
+<style>
+    .vy-invoice-card {{
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 16px;
+    }}
+    .vy-invoice-header {{
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }}
+    .vy-invoice-date {{
+        text-align: right;
+        font-size: 13px;
+        color: #64748b;
+    }}
+
+    /* ----- Tablet (≤1024px) ----- */
+    @media screen and (max-width: 1024px) {{
+        .vy-welcome-banner {{ padding: 22px 20px !important; }}
+        .vy-banner-name {{ font-size: 24px !important; }}
+        .vy-section-title {{ font-size: 18px !important; }}
+    }}
+
+    /* ----- Mobile (≤768px) ----- */
+    @media screen and (max-width: 768px) {{
+        /* Stack multi-column layouts (charts, forms, 2-col pages) */
+        .main {row} {{
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }}
+        .main {row} > {col} {{
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+            width: 100% !important;
+        }}
+
+        /* KPI rows: 6 or 4 metrics → 2 per row */
+        .main {row}:has(> {col}:nth-child(6):last-child) > {col},
+        .main {row}:has(> {col}:nth-child(4):last-child) > {col} {{
+            flex: 1 1 calc(50% - 6px) !important;
+            min-width: calc(50% - 6px) !important;
+            width: calc(50% - 6px) !important;
+        }}
+
+        /* 3-col metric rows → 1 per row on small tablet */
+        .main {row}:has(> {col}:nth-child(3):last-child) > {col} {{
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+            width: 100% !important;
+        }}
+
+        /* Scroll wide tables instead of clipping */
+        .main [data-testid="stDataFrame"],
+        .main [data-testid="stDataFrame"] > div,
+        .main .stDataFrame {{
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }}
+
+        /* Charts fit narrow screens */
+        .main [data-testid="stPlotlyChart"],
+        .main .js-plotly-plot {{
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+        }}
+
+        /* Tabs: scroll if needed */
+        .main .stTabs [data-baseweb="tab-list"] {{
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }}
+        .main .stTabs [data-baseweb="tab"] {{
+            flex-shrink: 0 !important;
+            min-height: 44px !important;
+        }}
+
+        /* Touch-friendly sidebar nav */
+        section[data-testid="stSidebar"] .nav-link {{
+            min-height: 48px !important;
+            padding: 12px 16px !important;
+        }}
+        section[data-testid="stSidebar"] .stButton > button {{
+            min-height: 48px !important;
+        }}
+
+        /* Welcome banner */
+        .vy-welcome-banner {{ padding: 20px 18px !important; margin-bottom: 16px !important; }}
+        .vy-banner-name {{ font-size: 22px !important; }}
+        .vy-banner-desc {{ font-size: 13px !important; }}
+
+        /* Invoice card */
+        .vy-invoice-header {{
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+        }}
+        .vy-invoice-date {{ text-align: left !important; font-size: 13px; color: #64748b; }}
+
+        /* Insight cards */
+        .main [data-testid="stVerticalBlock"] .stMarkdown div[style*="border-left: 4px"] {{
+            word-break: break-word;
+        }}
+    }}
+
+    /* ----- Small phones (≤480px) ----- */
+    @media screen and (max-width: 480px) {{
+        .main .block-container {{
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }}
+
+        /* All columns full width */
+        .main {row} > {col} {{
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+            width: 100% !important;
+        }}
+
+        .main [data-testid="metric-container"] [data-testid="stMetricValue"] {{
+            font-size: 16px !important;
+        }}
+
+        .vy-welcome-banner {{ padding: 16px 14px !important; }}
+        .vy-banner-name {{ font-size: 20px !important; }}
+        .vy-banner-greeting {{ font-size: 13px !important; }}
+        .vy-section-title {{ font-size: 17px !important; }}
+        .vy-hero-title {{ font-size: 26px !important; }}
+
+        /* Login: compact hero, hide feature bullets */
+        .vy-login-hero {{
+            min-height: auto !important;
+            padding: 28px 20px !important;
+        }}
+        .vy-hero-features {{ display: none !important; }}
+        .vy-hero-sub br {{ display: none; }}
+
+        /* Login form card full bleed */
+        .main {row} > {col}:nth-child(3) {{
+            padding: 20px 16px !important;
+            border-radius: 16px !important;
+        }}
+    }}
+</style>
+"""
+
+
 def get_sidebar_patch_css():
     """Sidebar colors — loaded last so they win over Streamlit Cloud light theme."""
     return """
@@ -864,7 +1019,7 @@ def get_sidebar_navigation():
 def get_login_hero_html():
     """Get the hero section HTML for the login page"""
     html = """
-<div style="
+<div class="vy-login-hero" style="
     background: linear-gradient(145deg, #0f172a 0%, #134e4a 55%, #0d9488 100%);
     border-radius: 20px;
     padding: 44px 36px;
@@ -902,7 +1057,7 @@ def get_login_hero_html():
         ">V</div>
         <div class="vy-hero-title">Vyapar</div>
         <div class="vy-hero-sub">Smart inventory, sales &amp; bookkeeping<br>for growing businesses</div>
-        <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="vy-hero-features" style="display: flex; flex-direction: column; gap: 16px;">
             <div style="display: flex; align-items: center; gap: 14px;">
                 <div style="
                     width: 40px; height: 40px;
@@ -960,6 +1115,7 @@ def get_login_page_css():
     }
 
     /* Form column card */
+    .main [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3),
     .main [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(3) {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -969,6 +1125,7 @@ def get_login_page_css():
         position: relative;
         overflow: hidden;
     }
+    .main [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3)::before,
     .main [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(3)::before {
         content: "";
         position: absolute;
@@ -978,7 +1135,7 @@ def get_login_page_css():
     }
 
     /* Tabs */
-    .main [data-testid="column"]:nth-child(3) .stTabs [data-baseweb="tab-list"] {
+    .main [data-testid="stColumn"]:nth-child(3) .stTabs [data-baseweb="tab-list"] {
         background: #f1f5f9 !important;
         border-radius: 12px !important;
         padding: 5px !important;
@@ -986,7 +1143,7 @@ def get_login_page_css():
         border: 1px solid #e2e8f0 !important;
         margin-bottom: 8px;
     }
-    .main [data-testid="column"]:nth-child(3) .stTabs [data-baseweb="tab"] {
+    .main [data-testid="stColumn"]:nth-child(3) .stTabs [data-baseweb="tab"] {
         border-radius: 9px !important;
         padding: 10px 20px !important;
         font-weight: 600 !important;
@@ -995,37 +1152,37 @@ def get_login_page_css():
         background: transparent !important;
         border: none !important;
     }
-    .main [data-testid="column"]:nth-child(3) .stTabs [data-baseweb="tab"]:hover {
+    .main [data-testid="stColumn"]:nth-child(3) .stTabs [data-baseweb="tab"]:hover {
         color: #0f766e !important;
         background: rgba(255,255,255,0.7) !important;
     }
-    .main [data-testid="column"]:nth-child(3) .stTabs [aria-selected="true"] {
+    .main [data-testid="stColumn"]:nth-child(3) .stTabs [aria-selected="true"] {
         background: #ffffff !important;
         color: #0f766e !important;
         font-weight: 700 !important;
         box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08) !important;
     }
-    .main [data-testid="column"]:nth-child(3) .stTabs [data-baseweb="tab-highlight"],
-    .main [data-testid="column"]:nth-child(3) .stTabs [data-baseweb="tab-border"] {
+    .main [data-testid="stColumn"]:nth-child(3) .stTabs [data-baseweb="tab-highlight"],
+    .main [data-testid="stColumn"]:nth-child(3) .stTabs [data-baseweb="tab-border"] {
         display: none !important;
     }
 
     /* Labels */
-    .main [data-testid="column"]:nth-child(3) .stTextInput label,
-    .main [data-testid="column"]:nth-child(3) .stSelectbox label,
-    .main [data-testid="column"]:nth-child(3) .stTextInput label p,
-    .main [data-testid="column"]:nth-child(3) .stSelectbox label p,
-    .main [data-testid="column"]:nth-child(3) .stTextInput label span,
-    .main [data-testid="column"]:nth-child(3) .stSelectbox label span {
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput label,
+    .main [data-testid="stColumn"]:nth-child(3) .stSelectbox label,
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput label p,
+    .main [data-testid="stColumn"]:nth-child(3) .stSelectbox label p,
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput label span,
+    .main [data-testid="stColumn"]:nth-child(3) .stSelectbox label span {
         color: #334155 !important;
         font-weight: 600 !important;
         font-size: 13px !important;
     }
 
     /* Text inputs — override Streamlit dark theme */
-    .main [data-testid="column"]:nth-child(3) .stTextInput > div > div > input,
-    .main [data-testid="column"]:nth-child(3) .stTextInput div[data-baseweb="input"] > input,
-    .main [data-testid="column"]:nth-child(3) .stTextInput div[data-baseweb="input"] {
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput > div > div > input,
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput div[data-baseweb="input"] > input,
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput div[data-baseweb="input"] {
         background-color: #f8fafc !important;
         border: 1.5px solid #cbd5e1 !important;
         border-radius: 12px !important;
@@ -1034,36 +1191,36 @@ def get_login_page_css():
         padding: 12px 14px !important;
         transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
     }
-    .main [data-testid="column"]:nth-child(3) .stTextInput > div > div > input:focus,
-    .main [data-testid="column"]:nth-child(3) .stTextInput div[data-baseweb="input"]:focus-within {
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput > div > div > input:focus,
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput div[data-baseweb="input"]:focus-within {
         border-color: #0d9488 !important;
         box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15) !important;
         background-color: #ffffff !important;
         outline: none !important;
     }
-    .main [data-testid="column"]:nth-child(3) .stTextInput input::placeholder {
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput input::placeholder {
         color: #94a3b8 !important;
         opacity: 1 !important;
     }
 
     /* Selectbox */
-    .main [data-testid="column"]:nth-child(3) .stSelectbox [data-baseweb="select"] > div {
+    .main [data-testid="stColumn"]:nth-child(3) .stSelectbox [data-baseweb="select"] > div {
         background-color: #f8fafc !important;
         border: 1.5px solid #cbd5e1 !important;
         border-radius: 12px !important;
         color: #0f172a !important;
         min-height: 46px !important;
     }
-    .main [data-testid="column"]:nth-child(3) .stSelectbox [data-baseweb="select"] span {
+    .main [data-testid="stColumn"]:nth-child(3) .stSelectbox [data-baseweb="select"] span {
         color: #0f172a !important;
     }
-    .main [data-testid="column"]:nth-child(3) .stSelectbox [data-baseweb="select"] > div:focus-within {
+    .main [data-testid="stColumn"]:nth-child(3) .stSelectbox [data-baseweb="select"] > div:focus-within {
         border-color: #0d9488 !important;
         box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15) !important;
     }
 
     /* Form container */
-    .main [data-testid="column"]:nth-child(3) [data-testid="stForm"] {
+    .main [data-testid="stColumn"]:nth-child(3) [data-testid="stForm"] {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
@@ -1071,9 +1228,9 @@ def get_login_page_css():
     }
 
     /* Submit buttons — teal not red */
-    .main [data-testid="column"]:nth-child(3) [data-testid="stFormSubmitButton"] button,
-    .main [data-testid="column"]:nth-child(3) [data-testid="stFormSubmitButton"] > button,
-    .main [data-testid="column"]:nth-child(3) .stFormSubmitButton button {
+    .main [data-testid="stColumn"]:nth-child(3) [data-testid="stFormSubmitButton"] button,
+    .main [data-testid="stColumn"]:nth-child(3) [data-testid="stFormSubmitButton"] > button,
+    .main [data-testid="stColumn"]:nth-child(3) .stFormSubmitButton button {
         background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%) !important;
         color: #ffffff !important;
         border: none !important;
@@ -1085,15 +1242,61 @@ def get_login_page_css():
         box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35) !important;
         transition: transform 0.2s ease, box-shadow 0.2s ease !important;
     }
-    .main [data-testid="column"]:nth-child(3) [data-testid="stFormSubmitButton"] button:hover {
+    .main [data-testid="stColumn"]:nth-child(3) [data-testid="stFormSubmitButton"] button:hover {
         transform: translateY(-1px) !important;
         box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4) !important;
     }
 
     /* Spacing between fields */
-    .main [data-testid="column"]:nth-child(3) .stTextInput,
-    .main [data-testid="column"]:nth-child(3) .stSelectbox {
+    .main [data-testid="stColumn"]:nth-child(3) .stTextInput,
+    .main [data-testid="stColumn"]:nth-child(3) .stSelectbox {
         margin-bottom: 4px;
+    }
+
+    /* ----- Login mobile ----- */
+    @media screen and (max-width: 768px) {
+        .main .block-container {
+            max-width: 100% !important;
+            padding-top: 16px !important;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+        }
+
+        /* Hide spacer column; stack hero + form */
+        .main [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2),
+        .main [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(2) {
+            display: none !important;
+        }
+        .main [data-testid="stHorizontalBlock"] {
+            flex-direction: column !important;
+            gap: 16px !important;
+        }
+        /* Form first on mobile for faster sign-in */
+        .main [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3),
+        .main [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(3) {
+            order: -1 !important;
+        }
+        .main [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(1),
+        .main [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(1) {
+            order: 1 !important;
+        }
+
+        .vy-login-hero {
+            min-height: auto !important;
+            padding: 32px 24px !important;
+        }
+
+        .main [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3),
+        .main [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(3) {
+            padding: 24px 20px !important;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .main [data-testid="stColumn"]:nth-child(3) .stTabs [data-baseweb="tab"] {
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+        }
     }
 </style>
 """
@@ -1153,7 +1356,7 @@ def get_welcome_banner(user_name):
         icon = "🌙"
 
     return f"""
-<div style="
+<div class="vy-welcome-banner" style="
     background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
     border-radius: 16px;
     padding: 28px 32px;
